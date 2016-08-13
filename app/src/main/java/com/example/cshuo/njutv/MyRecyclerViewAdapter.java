@@ -60,9 +60,12 @@ public class MyRecyclerViewAdapter extends RecyclerView
 //        holder.dateTime.setText(mDataset.get(position).getmText2());
     }
 
-    public void deleteItem(int index) {
-        mDataset.remove(index);
-        notifyItemRemoved(index);
+    public void clear() {
+        mDataset.clear();
+    }
+
+    public void addAll(ArrayList<TvContent.TvItem> items){
+        mDataset.addAll(items);
     }
 
     @Override
