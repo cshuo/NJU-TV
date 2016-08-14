@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import org.htmlparser.Parser;
 import org.htmlparser.filters.AndFilter;
@@ -40,6 +42,7 @@ public class MainActivity extends ActionBarActivity{
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout swipeContainer;
     private TvContent tvContent;
+    private Snackbar snackbar;
     private static String LOG_TAG = "MainActivity";
     public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
 
@@ -70,6 +73,27 @@ public class MainActivity extends ActionBarActivity{
                 android.R.color.holo_red_light);
 
         new DownloadTask().execute();
+
+        makeSnackbar();
+    }
+
+    /**
+     * popup tips
+     */
+    private void makeSnackbar(){
+        snackbar = Snackbar.make(findViewById(R.id.myCoordinatorLayout), R.string.netwarning,
+                Snackbar.LENGTH_INDEFINITE).setAction("DISMISS", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {}
+        });
+        TextView snackbarActionTextView = (TextView) snackbar.getView().findViewById(
+                android.support.design.R.id.snackbar_action);
+        snackbarActionTextView.setTextSize(20);
+        snackbarActionTextView.setTypeface(snackbarActionTextView.getTypeface(), Typeface.BOLD);
+
+        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(
+                android.support.design.R.id.snackbar_text);
+        snackbarTextView.setTextSize(18);
     }
 
 
@@ -161,19 +185,15 @@ public class MainActivity extends ActionBarActivity{
             Iterator item = null;
 
             if(results != null){
+                snackbar.dismiss();
+                makeSnackbar();
                 item = results.entrySet().iterator();
                 while(item.hasNext()){
                     Map.Entry entry = (Map.Entry) item.next();
                     tvContent.addItem(new TvContent.TvItem(entry.getKey().toString(), entry.getValue().toString()));
                 }
             } else {
-//                Snackbar.make(findViewById(R.id.myCoordinatorLayout), R.string.netwarning,
-//                        Snackbar.LENGTH_LONG).show();
-                Snackbar.make(findViewById(R.id.myCoordinatorLayout), R.string.netwarning,
-                        Snackbar.LENGTH_INDEFINITE).setAction("DISMISS", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {}
-                        }).show();
+                snackbar.show();
             }
             swipeContainer.setRefreshing(false);
             mAdapter = new MyRecyclerViewAdapter((ArrayList<TvContent.TvItem>) tvContent.getItems());
